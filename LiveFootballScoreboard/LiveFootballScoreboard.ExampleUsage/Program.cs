@@ -1,4 +1,3 @@
-﻿using LiveFootballScoreboard;
+﻿using LiveFootballScoreboard.Services;
 
-var helloSportradar = new HelloSportradar();
-Console.WriteLine(helloSportradar.SayHello());
+var scoreboardService = new ScoreboardService();
