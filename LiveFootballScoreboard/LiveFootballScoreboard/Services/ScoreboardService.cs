@@ -1,8 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using LiveFootballScoreboard.Contracts;
 using LiveFootballScoreboard.Models;
 
 namespace LiveFootballScoreboard.Services;
-public class ScoreboardService
+
+internal class ScoreboardService : IScoreboard
 {
     private Scoreboard _scoreboard;
 
@@ -11,17 +12,17 @@ public class ScoreboardService
         throw new NotImplementedException();
     }
 
-    void UpdateScore(Guid matchGuid, int homeTeamScore, int awayTeamScore)
+    public void UpdateScore(Guid matchGuid, int homeTeamScore, int awayTeamScore)
     {
         throw new NotImplementedException();
     }
 
-    void FinishMatch(Guid matchGuid)
+    public void FinishMatch(Guid matchGuid)
     {
         throw new NotImplementedException();
     }
 
-    void GetSummary()
+    public void GetSummary()
     {
         throw new NotImplementedException();
     }

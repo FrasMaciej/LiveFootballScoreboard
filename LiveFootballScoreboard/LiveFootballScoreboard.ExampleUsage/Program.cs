@@ -1,3 +1,4 @@
-﻿using LiveFootballScoreboard.Services;
+﻿using LiveFootballScoreboard.Contracts;
 
-var scoreboardService = new ScoreboardService();
+IScoreboard scoreboard = ScoreboardFactory.Create(); 
+scoreboard.GetSummary();
