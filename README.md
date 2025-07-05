@@ -112,7 +112,7 @@ This interface defines the operations supported by the scoreboard.
 6. `IEnumerable<MatchesSummary> GetSummary()`
    - **Description:** Retrieves a summary of all matches in progress, ordered by total score and start time.
    - **Parameters:** None
-   - **Returns:** A collection of `MatchesSummary` objects.
+   - **Returns:** `MatchesSummary` objects.
 
 #### `MatchesSummary`
 This class provides a summary of matches.
