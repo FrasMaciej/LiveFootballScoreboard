@@ -2,6 +2,6 @@
 
 internal class Team
 {
-    public string Name { get; set; }
+    public required string Name { get; set; }
     public int Score { get; set; }
 }
