@@ -1,5 +1,17 @@
 ﻿namespace LiveFootballScoreboard.Contracts;
+
+/// <summary>
+/// Represents a summary of all ongoing matches.
+/// </summary>
 public class MatchesSummary
 {
-    public required IEnumerable<MatchResult> MatchResults { get; set; } 
+    internal MatchesSummary(IReadOnlyList<MatchResult> matchResults)
+    {
+        MatchResults = matchResults;
+    }
+
+    /// <summary>
+    /// Gets the list of match results.
+    /// </summary>
+    public IReadOnlyList<MatchResult> MatchResults { get; } 
 }

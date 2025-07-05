@@ -1,7 +1,6 @@
 using FluentAssertions;
 using LiveFootballScoreboard.Contracts;
 using LiveFootballScoreboard.Services;
-using System;
 
 namespace LiveFootballScoreboard.Tests;
 
@@ -166,5 +165,67 @@ public class ScoreboardServiceTests
         act.Should().Throw<ArgumentException>().WithMessage("Scores must be non-negative.");
         act2.Should().Throw<ArgumentException>().WithMessage("Scores must be non-negative.");
         act3.Should().Throw<ArgumentException>().WithMessage("Scores must be non-negative.");
+    }
+
+    [Fact]
+    public void UpdateScore_ByTeamNamesShouldUpdateMatchScores()
+    {
+        // Arrange
+        _scoreboard.StartMatch("Team A", "Team B");
+
+        // Act
+        _scoreboard.UpdateScore("Team A", "Team B", 3, 2);
+
+        // Assert
+        var summary = _scoreboard.GetSummary();
+        summary.MatchResults.Should().ContainSingle(match =>
+            match.HomeTeam == "Team A" &&
+            match.AwayTeam == "Team B" &&
+            match.HomeScore == 3 &&
+            match.AwayScore == 2);
+    }
+
+    [Fact]
+    public void FinishMatch_ByTeamNamesShouldRemoveMatchFromScoreboard()
+    {
+        // Arrange
+        _scoreboard.StartMatch("Team A", "Team B");
+
+        // Act
+        _scoreboard.FinishMatch("Team A", "Team B");
+
+        // Assert
+        var summary = _scoreboard.GetSummary();
+        summary.MatchResults.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void UpdateScore_ByTeamNamesShouldThrowExceptionWhenMatchNotFound()
+    {
+        // Arrange
+        _scoreboard.StartMatch("Team A", "Team B");
+
+        // Act
+        Action act = () => _scoreboard.UpdateScore("Nonexistent Team A", "Nonexistent Team B", 1, 1);
+        Action act2 = () => _scoreboard.UpdateScore("", "Team B", 1, 1);
+        Action act3 = () => _scoreboard.UpdateScore("Team A", "", 1, 1);
+        Action act4 = () => _scoreboard.UpdateScore("Team A", "Team A", 1, 1);
+
+
+        // Assert
+        act.Should().Throw<KeyNotFoundException>().WithMessage("No match found for teams Nonexistent Team A vs Nonexistent Team B.");
+        act2.Should().Throw<ArgumentException>().WithMessage("Team names cannot be null or empty. (Parameter 'homeTeam')");
+        act3.Should().Throw<ArgumentException>().WithMessage("Team names cannot be null or empty. (Parameter 'awayTeam')");
+        act4.Should().Throw<ArgumentException>().WithMessage("A team cannot play against itself.");
+    }
+
+    [Fact]
+    public void FinishMatch_ByTeamNamesShouldThrowExceptionWhenMatchNotFound()
+    {
+        // Act
+        Action act = () => _scoreboard.FinishMatch("Nonexistent Team A", "Nonexistent Team B");
+
+        // Assert
+        act.Should().Throw<KeyNotFoundException>().WithMessage("No match found for teams Nonexistent Team A vs Nonexistent Team B.");
     }
 }

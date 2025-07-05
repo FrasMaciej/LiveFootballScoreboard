@@ -1,4 +1,5 @@
-﻿using LiveFootballScoreboard.Contracts;
+﻿using System.Collections.Immutable;
+using LiveFootballScoreboard.Contracts;
 using LiveFootballScoreboard.Models;
 
 namespace LiveFootballScoreboard.Services;
@@ -47,6 +48,29 @@ internal class ScoreboardService : IScoreboard
         return newMatchId;
     }
 
+    private Guid GetMatchIdByTeams(string homeTeam, string awayTeam)
+    {
+        if (string.IsNullOrWhiteSpace(homeTeam))
+            throw new ArgumentException("Team names cannot be null or empty.", nameof(homeTeam));
+        if (string.IsNullOrWhiteSpace(awayTeam))
+            throw new ArgumentException("Team names cannot be null or empty.", nameof(awayTeam));
+
+        var homeTeamNormalized = homeTeam.Trim().ToLowerInvariant();
+        var awayTeamNormalized = awayTeam.Trim().ToLowerInvariant();
+
+        if (homeTeamNormalized == awayTeamNormalized)
+            throw new ArgumentException("A team cannot play against itself.");
+
+        var match = _matchesById.FirstOrDefault(m =>
+            m.Value.HomeTeam.Name.ToLowerInvariant() == homeTeamNormalized &&
+            m.Value.AwayTeam.Name.ToLowerInvariant() == awayTeamNormalized);
+
+        if (match.Key == Guid.Empty)
+            throw new KeyNotFoundException($"No match found for teams {homeTeam} vs {awayTeam}.");
+
+        return match.Key;
+    }
+
     public void UpdateScore(Guid matchGuid, int homeTeamScore, int awayTeamScore)
     {
         if (homeTeamScore < 0 || awayTeamScore < 0)
@@ -59,10 +83,22 @@ internal class ScoreboardService : IScoreboard
         match.AwayTeam.Score = awayTeamScore;
     }
 
+    public void UpdateScore(string homeTeam, string awayTeam, int homeTeamScore, int awayTeamScore)
+    {
+        var matchId = GetMatchIdByTeams(homeTeam, awayTeam);
+        UpdateScore(matchId, homeTeamScore, awayTeamScore);
+    }
+
     public void FinishMatch(Guid matchGuid)
     {
         if (!_matchesById.Remove(matchGuid))
             throw new KeyNotFoundException($"No match found with ID {matchGuid}.");
+    }
+
+    public void FinishMatch(string homeTeam, string awayTeam)
+    {
+        var matchId = GetMatchIdByTeams(homeTeam, awayTeam);
+        FinishMatch(matchId);
     }
 
     public MatchesSummary GetSummary()
@@ -70,14 +106,14 @@ internal class ScoreboardService : IScoreboard
         var matches = _matchesById.Values
             .OrderByDescending(m => m.HomeTeam.Score + m.AwayTeam.Score)
             .ThenByDescending(m => m.MatchStartDateTime)
-            .Select(m => new MatchResult
-            {
-                HomeTeam = m.HomeTeam.Name,
-                HomeScore = m.HomeTeam.Score,
-                AwayTeam = m.AwayTeam.Name,
-                AwayScore = m.AwayTeam.Score
-            });
+            .Select(m => new MatchResult(
+                m.HomeTeam.Name,
+                m.HomeTeam.Score,
+                m.AwayTeam.Name,
+                m.AwayTeam.Score
+                ))
+            .ToImmutableList();
 
-        return new MatchesSummary { MatchResults = matches };
+        return new MatchesSummary(matches);
     }
 }
