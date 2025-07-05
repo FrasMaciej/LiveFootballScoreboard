@@ -1,19 +1,31 @@
 # Live Football Score Board Documentation
 
-The library consists of two parts:
-1. User API Reference
-2. Library implementation description
+The library consists of three parts:
 
-## How to Use
+1. Project building guide
+2. User API Reference
+3. Library implementation description
 
-To test library you need to use .NET 8 
+# 1. Project building guide
+
+To test library you need to use .NET 8 or newer
 
 1. Clone the repository.
 2. Build the solution to restore dependencies (using dotnet CLI or your IDE like Visual Studio or Rider)
 3. Run the tests to verify the implementation.
 4. Play with the library using provided additional console application
 
-# 1. User Api Reference
+Detailed commands to Build and test with CLI (execute from main project directory):
+1. dotnet build LiveFootballScoreboard.sln
+2. dotnet test LiveFootballScoreboard.Tests/LiveFootballScoreboard.Tests.csproj
+3. dotnet run --project LiveFootballScoreboard.ExampleUsage/LiveFootballScoreboard.ExampleUsage.csproj
+
+To generate tests report (execute from Tests directory):
+1. dotnet test --collect:"XPlat Code Coverage" --results-directory ./TestResults
+2. reportgenerator -reports:./TestResults/**/coverage.cobertura.xml -targetdir:./CoverageReport -reporttypes:Html
+3. report is available in LiveFootballScoreboard.Tests/CoverageReport/index.html
+
+# 2. User Api Reference
 
 ## Project Overview
 
@@ -131,7 +143,7 @@ This factory class is used to create instances of the scoreboard.
       - **Parameters:** None
       - **Returns:** An instance of `IScoreboard`.
 
-# 2. Library implementation description
+# 3. Library implementation description
 
 ## Design and Implementation
 
